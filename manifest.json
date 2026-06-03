@@ -1,0 +1,19 @@
+{
+  "name": "EnglishUp 英文學習",
+  "short_name": "EnglishUp",
+  "description": "英文單字與文法學習應用程式",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366F1",
+  "lang": "zh-TW",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

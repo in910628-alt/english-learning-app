@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#6366F1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>EnglishUp 英文學習</title>
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+</head>
+<body>
+
+  <!-- Loading splash -->
+  <div id="app-root">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px">
+      <div style="font-size:56px">🎓</div>
+      <div style="font-size:22px;font-weight:700;color:#6366F1">EnglishUp</div>
+      <div style="font-size:14px;color:#6B7280">載入中...</div>
+    </div>
+  </div>
+
+  <!-- Speech API check banner (shown if not supported) -->
+  <div id="speech-warn" style="display:none;position:fixed;bottom:0;left:0;right:0;
+    background:#FFFBEB;border-top:2px solid #FCD34D;padding:12px 16px;
+    font-size:13px;color:#92400E;text-align:center;z-index:999">
+    ⚠️ 建議使用 <strong>Google Chrome</strong> 以支援錄音功能。其他功能正常使用。
+    <button onclick="this.parentElement.style.display='none'"
+            style="margin-left:12px;background:#F59E0B;color:white;border:none;
+                   padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer">
+      了解
+    </button>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="grammar-data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // Check speech support
+    window.addEventListener('DOMContentLoaded', () => {
+      const hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+      const hasTTS = !!window.speechSynthesis;
+      if (!hasSR || !hasTTS) {
+        document.getElementById('speech-warn').style.display = 'block';
+      }
+    });
+
+    // Register service worker for PWA offline support
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
