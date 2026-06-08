@@ -111,6 +111,18 @@ function getDailyWords(themeId, count = 20) {
   const combined = [...wrongInTheme, ...shuffled].slice(0, Math.min(count, vocab.length));
   return combined;
 }
+function getDailyWordsMixed(count = 20) {
+  const allVocab = Object.values(VOCABULARY).flat();
+  const seed = parseInt(todayStr().replace(/-/g, '')) + 99;
+  const rng = seededRandom(seed);
+
+  const wrongIds = new Set(Object.keys(getWrongWords()));
+  const wrongWords = allVocab.filter(w => wrongIds.has(w.id));
+  const rest = allVocab.filter(w => !wrongIds.has(w.id));
+
+  const shuffled = [...rest].sort(() => rng() - 0.5);
+  return [...wrongWords, ...shuffled].slice(0, Math.min(count, allVocab.length));
+}
 
 // ---- Speech ----
 let speechSynth = window.speechSynthesis;
@@ -267,6 +279,18 @@ function renderHome() {
             <div class="progress-label">${pct}% 完成</div>
           </div>`;
         }).join('')}
+      </div>
+
+      <div class="section-label" style="margin-top:24px">每日混合測驗</div>
+      <div style="padding:0 16px">
+        <button class="grammar-home-entry" onclick="startMixedQuiz()" style="background:linear-gradient(135deg,#6366F1,#8B5CF6);color:white;border:none">
+          <span class="grammar-entry-icon">🎲</span>
+          <div class="grammar-entry-text">
+            <div class="grammar-entry-title" style="color:white">Daily Mixed Quiz 每日混合測驗</div>
+            <div class="grammar-entry-sub" style="color:rgba(255,255,255,0.8)">從所有主題隨機抽 20 題，每天不同組合</div>
+          </div>
+          <span class="grammar-entry-arrow" style="color:white">→</span>
+        </button>
       </div>
 
       <div class="section-label" style="margin-top:24px">文法練習</div>
@@ -523,6 +547,23 @@ function showVocab(filter, btn) {
 }
 
 // ---- Quiz Page ----
+function startMixedQuiz() {
+  const words = getDailyWordsMixed(20);
+  if (words.length < 4) { alert('單字數量不足！'); return; }
+  const queue = buildQuizQueue(words);
+  Object.assign(state, {
+    page: 'quiz',
+    quizThemeId: 'mixed',
+    quizWords: words,
+    quizQueue: [...queue],
+    quizWrongInSession: [],
+    quizAnswered: 0,
+    quizScore: 0,
+    quizPhase: 'main',
+    currentQuestion: queue[0],
+  });
+  render();
+}
 function startQuiz(themeId) {
   const words = getDailyWords(themeId, 20);
   if (words.length < 4) { alert('單字數量不足，請先瀏覽單字表！'); return; }
@@ -730,7 +771,7 @@ function renderQuizResults() {
         </div>
 
         <button class="results-home-btn" onclick="navigate('home')">返回首頁</button>
-        <button class="results-retry-btn" onclick="startQuiz('${state.quizThemeId}')">再測一次</button>
+        <button class="results-retry-btn" onclick="${state.quizThemeId === 'mixed' ? 'startMixedQuiz()' : `startQuiz('${state.quizThemeId}')`}">再測一次</button>
       </div>
     </div>`;
 }
